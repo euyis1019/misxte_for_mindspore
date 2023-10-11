@@ -7,7 +7,7 @@ Copy-paste from torch.nn.MultiheadAttention and F.multi_head_attention_forward w
     * layerwise parameters sharing
 """
 import warnings
-
+from msTorch import *
 import torch
 from torch import nn
 
@@ -19,36 +19,37 @@ from torch.nn.init import xavier_normal_
 from torch.nn.functional import linear, softmax, dropout
 
 from einops import rearrange
-
-
-def linear_multi_head_attention_forward(query,                           # type: Tensor
-                                 key,                             # type: Tensor
-                                 value,                           # type: Tensor
-                                 embed_dim_to_check,              # type: int
-                                 num_heads,                       # type: int
-                                 in_proj_weight,                  # type: Tensor
-                                 in_proj_bias,                    # type: Tensor
-                                 bias_k,                          # type: Optional[Tensor]
-                                 bias_v,                          # type: Optional[Tensor]
-                                 bias_e,                          # type: Optional[Tensor]
-                                 bias_f,                          # type: Optional[Tensor]
-                                 add_zero_attn,                   # type: bool
-                                 dropout_p,                       # type: float
-                                 out_proj_weight,                 # type: Tensor
-                                 out_proj_bias,                   # type: Tensor
-                                 training=True,                   # type: bool
-                                 key_padding_mask=None,           # type: Optional[Tensor]
-                                 need_weights=False,               # type: bool
-                                 attn_mask=None,                  # type: Optional[Tensor]
-                                 use_separate_proj_weight=False,  # type: bool
-                                 q_proj_weight=None,              # type: Optional[Tensor]
-                                 k_proj_weight=None,              # type: Optional[Tensor]
-                                 v_proj_weight=None,              # type: Optional[Tensor]
-                                 e_proj_weight=None,              # type: Optional[Tensor]
-                                 f_proj_weight=None,              # type: Optional[Tensor]
-                                 static_k=None,                   # type: Optional[Tensor]
-                                 static_v=None                    # type: Optional[Tensor]
-                                 ):
+from typing import Optional
+from mindspore import Tensor
+def linear_multi_head_attention_forward(
+        query: Tensor,
+        key: Tensor,
+        value: Tensor,
+        embed_dim_to_check: int,
+        num_heads: int,
+        in_proj_weight: Tensor,
+        in_proj_bias: Tensor,
+        bias_k: Optional[Tensor] = None,
+        bias_v: Optional[Tensor] = None,
+        bias_e: Optional[Tensor] = None,
+        bias_f: Optional[Tensor] = None,
+        add_zero_attn: bool = False,
+        dropout_p: float = 0.0,
+        out_proj_weight: Tensor,
+        out_proj_bias: Tensor,
+        training: bool = True,
+        key_padding_mask: Optional[Tensor] = None,
+        need_weights: bool = False,
+        attn_mask: Optional[Tensor] = None,
+        use_separate_proj_weight: bool = False,
+        q_proj_weight: Optional[Tensor] = None,
+        k_proj_weight: Optional[Tensor] = None,
+        v_proj_weight: Optional[Tensor] = None,
+        e_proj_weight: Optional[Tensor] = None,
+        f_proj_weight: Optional[Tensor] = None,
+        static_k: Optional[Tensor] = None,
+        static_v: Optional[Tensor] = None
+) :
     # type: (...) -> Tuple[Tensor, Optional[Tensor]]
     r"""
     Args:
@@ -129,8 +130,9 @@ def linear_multi_head_attention_forward(query,                           # type:
     assert head_dim * num_heads == embed_dim, "embed_dim must be divisible by num_heads"
     scaling = float(head_dim) ** -0.5
 
+#投影权重--是否使用单独的投影权重
     if not use_separate_proj_weight:
-        if torch.equal(query, key) and torch.equal(key, value):
+        if mft.tensor_equal(key,query) and mft.tensor_equal(key, value):#为什么这里是一样的 /用mindspore加一个if可以搞定
             # self-attention
             q, k, v = linear(query, in_proj_weight, in_proj_bias).chunk(3, dim=-1)
 

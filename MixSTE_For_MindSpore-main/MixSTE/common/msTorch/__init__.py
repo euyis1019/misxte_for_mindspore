@@ -1,0 +1,1 @@
+from .mindspore_for_torch import *
