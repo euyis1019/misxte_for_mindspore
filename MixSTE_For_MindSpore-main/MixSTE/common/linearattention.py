@@ -121,6 +121,7 @@ def linear_multi_head_attention_forward(
     #             v_proj_weight=v_proj_weight, e_proj_weight=q_proj_weight, 
     #             f_proj_weight=k_proj_weight, static_k=static_k, static_v=static_v)
     tgt_len, bsz, embed_dim = query.size()
+    query.
     seq_len, proj_k = e_proj_weight.size()
     assert embed_dim == embed_dim_to_check
     # allow MHA to have different sizes for the feature dimension

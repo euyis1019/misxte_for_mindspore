@@ -46,3 +46,8 @@ class mft:
             return False
 
         return sum_result == tensor1.size
+
+
+if __name__ == "__main__":
+    x = Tensor(np.array([[0, 1], [2, 3], [4, 5]]))
+    print(x.shape)
